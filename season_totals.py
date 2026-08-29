@@ -37,6 +37,11 @@ data/season_totals_all.csv with a SEASON column, so a later run only
 needs to (re-)pull seasons that are missing or that you explicitly ask
 for with --start/--end.
 
+A season that fails after retries (very old seasons sometimes hang rather
+than error cleanly) is skipped, not fatal -- the run continues through the
+rest, and skipped seasons are listed at the end and written to
+data/season_totals_failed.txt so you can retry just those.
+
 Usage:
     pip install requests pandas
     python season_totals.py                          # all seasons 1979-80..2025-26
@@ -57,8 +62,10 @@ log = logging.getLogger(__name__)
 
 DATA_DIR = Path("data/season_totals")
 COMBINED_PATH = Path("data/season_totals_all.csv")
+FAILED_LOG_PATH = Path("data/season_totals_failed.txt")
 REQUEST_DELAY = 1.5  # seconds between calls -- be polite to stats.nba.com
-MAX_RETRIES = 4
+REQUEST_TIMEOUT = 20  # seconds -- old seasons can hang rather than error cleanly
+MAX_RETRIES = 3
 
 NBA_STATS_URL = "https://stats.nba.com/stats/leaguedashplayerstats"
 HEADERS = {
@@ -100,7 +107,7 @@ def fetch_season(season: str) -> pd.DataFrame:
     last_err = None
     for attempt in range(1, MAX_RETRIES + 1):
         try:
-            resp = requests.get(NBA_STATS_URL, headers=HEADERS, params=params, timeout=30)
+            resp = requests.get(NBA_STATS_URL, headers=HEADERS, params=params, timeout=REQUEST_TIMEOUT)
             resp.raise_for_status()
             payload = resp.json()
             result_set = payload["resultSets"][0]
@@ -148,23 +155,47 @@ def main():
     log.info("Pulling %d season(s): %s .. %s", len(seasons), seasons[0], seasons[-1])
 
     all_frames = []
+    failed = []
     for i, season in enumerate(seasons, 1):
         out_path = DATA_DIR / f"{season}.csv"
         if out_path.exists() and not args.force:
             log.info("[%d/%d] %s already cached, loading from disk", i, len(seasons), season)
-            frame = pd.read_csv(out_path)
-        else:
-            log.info("[%d/%d] Fetching %s from stats.nba.com...", i, len(seasons), season)
+            all_frames.append(pd.read_csv(out_path))
+            continue
+
+        log.info("[%d/%d] Fetching %s from stats.nba.com...", i, len(seasons), season)
+        try:
             raw = fetch_season(season)
-            frame = derive_columns(raw, season)
-            frame.to_csv(out_path, index=False)
-            log.info("  -> %d players, saved to %s", len(frame), out_path)
-            time.sleep(REQUEST_DELAY)
+        except RuntimeError as e:
+            # Don't let one stubborn season (very old seasons sometimes hang
+            # instead of erroring cleanly) kill the whole 47-season run --
+            # log it, move on, and report it in the summary at the end. A
+            # season that failed here can be re-pulled on its own later with
+            # --start/--end/--force once the rest are cached.
+            log.error("  %s: giving up after retries (%s) -- skipping, will retry later", season, e)
+            failed.append(season)
+            continue
+
+        frame = derive_columns(raw, season)
+        frame.to_csv(out_path, index=False)
+        log.info("  -> %d players, saved to %s", len(frame), out_path)
         all_frames.append(frame)
+        time.sleep(REQUEST_DELAY)
+
+    if not all_frames:
+        raise SystemExit("Every season failed to fetch -- check your network connection and try again.")
 
     combined = pd.concat(all_frames, ignore_index=True)
     combined.to_csv(COMBINED_PATH, index=False)
-    log.info("Saved combined file: %s (%d rows across %d seasons)", COMBINED_PATH, len(combined), len(seasons))
+    log.info("Saved combined file: %s (%d rows across %d season(s))", COMBINED_PATH, len(combined), len(all_frames))
+
+    if failed:
+        FAILED_LOG_PATH.write_text("\n".join(failed) + "\n")
+        log.warning("%d season(s) could not be fetched and were skipped: %s", len(failed), ", ".join(failed))
+        log.warning("Listed in %s. Retry just those later, e.g.:", FAILED_LOG_PATH)
+        log.warning("  python season_totals.py --start %s --end %s", failed[0], failed[0])
+    else:
+        log.info("All requested seasons fetched successfully.")
 
 
 if __name__ == "__main__":
