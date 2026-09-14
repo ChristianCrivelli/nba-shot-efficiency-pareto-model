@@ -1,6 +1,18 @@
 """
 season_totals.py
 
+*** SUPERSEDED -- NOT PART OF THE CURRENT PIPELINE (as of 2026-09-02) ***
+This script's approach (a live pull from stats.nba.com) was abandoned:
+the stats.nba.com subdomain is unreachable from this project's network
+(confirmed geo-blocking, not a bug in this script -- see the project
+decisions log for the full story). Current data pipeline is
+load_kaggle_season_totals.py, which aggregates a static downloaded Kaggle
+dataset instead and also uses the NBA's real POSS_ACTUAL figure rather
+than the POSS_EST formula below. Kept here only as a record of what was
+tried -- do not run this expecting current data, and do not treat POSS_EST
+as the project's possessions methodology; that changed.
+***************************************************************************
+
 Pulls per-player, per-season regular-season box score totals from the NBA
 stats API for every season from 1979-80 (the first season with the
 3-point line) through the most recent completed season (2025-26 by

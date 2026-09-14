@@ -1,0 +1,92 @@
+ENTITY,SHOT_ZONE_BASIC,SHOT_ZONE_AREA,N_ATTEMPTS,N_MADE,TYPICAL_VALUE,FG_PCT,EV,RISK_VAR,LOW_SAMPLE,EFF_FULL,EFF_NONRA
+League Average,Above the Break 3,Back Court(BC),32,3,3,0.09375,0.28125,0.7646484375,False,,
+League Average,Above the Break 3,Center(C),15734,5617,3,0.3569975848480997,1.0708656412863862,2.0655894756556297,False,False,True
+League Average,Above the Break 3,Left Side Center(LC),24930,8949,3,0.35896510228640194,1.0768953068592058,2.0709824186422345,False,False,True
+League Average,Above the Break 3,Right Side Center(RC),23074,8370,3,0.3627459478200572,1.088194504637254,2.0803295563432083,False,False,True
+League Average,Backcourt,Back Court(BC),433,8,3,0.018475750577367205,0.05542725173210162,0.16320957496173108,False,,
+League Average,In The Paint (Non-RA),Center(C),38277,16872,2,0.44078689552472766,0.8815737910494553,0.9859752330336019,False,False,True
+League Average,In The Paint (Non-RA),Left Side(L),2262,1012,2,0.4473916887709991,0.8947833775419982,0.9889294623585303,False,False,True
+League Average,In The Paint (Non-RA),Right Side(R),2549,1098,2,0.430757159670459,0.861514319340918,0.9808217162523908,False,False,True
+League Average,Left Corner 3,Left Side(L),11523,4448,3,0.38601058752061096,1.1580317625618328,2.1330577245834332,False,False,True
+League Average,Mid-Range,Center(C),5471,2410,2,0.44050447815755805,0.8810089563151161,0.9858411315227821,False,False,True
+League Average,Mid-Range,Left Side Center(LC),3125,1261,2,0.40352,0.80704,0.9627664384,False,False,True
+League Average,Mid-Range,Left Side(L),6169,2562,2,0.415302318041822,0.8309288377370725,0.972387547051348,False,False,True
+League Average,Mid-Range,Right Side Center(RC),3491,1365,2,0.3910054425665998,0.7820108851331996,0.9524807457995889,False,False,True
+League Average,Mid-Range,Right Side(R),6333,2695,2,0.4255487130901626,0.8510974261803252,0.9778280235098763,False,False,True
+League Average,Restricted Area,Center(C),64669,42884,2,0.663130711778441,1.326261423556882,0.893553483498637,False,True,
+League Average,Right Corner 3,Right Side(R),10628,4185,3,0.3937711704930373,1.1813135114791118,2.1484389220342255,False,False,True
+LeBron James,Above the Break 3,Center(C),91,34,3,0.37362637362637363,1.120879120879121,2.1062673590146117,False,False,True
+LeBron James,Above the Break 3,Left Side Center(LC),148,65,3,0.4391891891891892,1.3175675675675675,2.216718407596786,False,False,False
+LeBron James,Above the Break 3,Right Side Center(RC),79,30,3,0.379746835443038,1.139240506329114,2.1198525877263257,False,False,True
+LeBron James,Backcourt,Back Court(BC),1,0,3,0.0,0.0,0.0,True,,
+LeBron James,In The Paint (Non-RA),Center(C),177,75,2,0.423728813559322,0.847457627118644,0.9767308244757253,False,False,True
+LeBron James,In The Paint (Non-RA),Left Side(L),13,4,2,0.3076923076923077,0.6153846153846154,0.8520710059171598,True,False,True
+LeBron James,In The Paint (Non-RA),Right Side(R),4,2,2,0.5,1.0,1.0,True,False,True
+LeBron James,Left Corner 3,Left Side(L),21,7,3,0.3333333333333333,1.0,2.0,False,False,False
+LeBron James,Mid-Range,Center(C),20,6,2,0.3,0.6,0.84,False,False,True
+LeBron James,Mid-Range,Left Side Center(LC),28,10,2,0.35714285714285715,0.7142857142857143,0.9183673469387755,False,False,True
+LeBron James,Mid-Range,Left Side(L),73,20,2,0.273972602739726,0.547945205479452,0.7956464627509852,False,False,True
+LeBron James,Mid-Range,Right Side Center(RC),18,9,2,0.5,1.0,1.0,True,False,True
+LeBron James,Mid-Range,Right Side(R),26,9,2,0.34615384615384615,0.6923076923076923,0.9053254437869822,False,False,True
+LeBron James,Restricted Area,Center(C),547,401,2,0.7330895795246801,1.4661791590493602,0.7826769916680312,False,True,
+LeBron James,Right Corner 3,Right Side(R),23,13,3,0.5652173913043478,1.6956521739130435,2.2117202268431004,False,True,True
+Luka Doncic,Above the Break 3,Center(C),220,82,3,0.37272727272727274,1.1181818181818182,2.104214876033058,False,False,False
+Luka Doncic,Above the Break 3,Left Side Center(LC),294,113,3,0.3843537414965986,1.153061224489796,2.1296334860474797,False,False,False
+Luka Doncic,Above the Break 3,Right Side Center(RC),199,82,3,0.4120603015075377,1.236180904522613,2.180399484861493,False,False,True
+Luka Doncic,Backcourt,Back Court(BC),5,0,3,0.0,0.0,0.0,True,,
+Luka Doncic,In The Paint (Non-RA),Center(C),282,152,2,0.5390070921985816,1.0780141843971631,0.9939137870328454,False,False,False
+Luka Doncic,In The Paint (Non-RA),Left Side(L),18,11,2,0.6111111111111112,1.2222222222222223,0.9506172839506173,True,False,True
+Luka Doncic,In The Paint (Non-RA),Right Side(R),38,22,2,0.5789473684210527,1.1578947368421053,0.9750692520775623,False,False,False
+Luka Doncic,Left Corner 3,Left Side(L),15,4,3,0.26666666666666666,0.8,1.7599999999999998,True,False,False
+Luka Doncic,Mid-Range,Center(C),48,24,2,0.5,1.0,1.0,False,False,False
+Luka Doncic,Mid-Range,Left Side Center(LC),54,27,2,0.5,1.0,1.0,False,False,False
+Luka Doncic,Mid-Range,Left Side(L),97,41,2,0.422680412371134,0.845360824742268,0.9760867254756085,False,False,False
+Luka Doncic,Mid-Range,Right Side Center(RC),32,8,2,0.25,0.5,0.75,False,False,True
+Luka Doncic,Mid-Range,Right Side(R),73,33,2,0.4520547945205479,0.9041095890410958,0.9908050290861324,False,False,False
+Luka Doncic,Restricted Area,Center(C),266,202,2,0.7593984962406015,1.518796992481203,0.7308496805924585,False,True,
+Luka Doncic,Right Corner 3,Right Side(R),11,3,3,0.2727272727272727,0.8181818181818182,1.7851239669421486,True,False,False
+Stephen Curry,Above the Break 3,Back Court(BC),1,0,3,0.0,0.0,0.0,True,,
+Stephen Curry,Above the Break 3,Center(C),211,80,3,0.3791469194312796,1.1374407582938388,2.1185507962534533,False,False,True
+Stephen Curry,Above the Break 3,Left Side Center(LC),294,112,3,0.38095238095238093,1.1428571428571428,2.1224489795918364,False,False,True
+Stephen Curry,Above the Break 3,Right Side Center(RC),290,123,3,0.4241379310344828,1.2724137931034483,2.1982045184304404,False,False,True
+Stephen Curry,Backcourt,Back Court(BC),2,0,3,0.0,0.0,0.0,True,,
+Stephen Curry,In The Paint (Non-RA),Center(C),197,103,2,0.5228426395939086,1.0456852791878173,0.9979128552655312,False,False,False
+Stephen Curry,In The Paint (Non-RA),Left Side(L),8,4,2,0.5,1.0,1.0,True,False,False
+Stephen Curry,In The Paint (Non-RA),Right Side(R),12,2,2,0.16666666666666666,0.3333333333333333,0.5555555555555556,True,True,True
+Stephen Curry,Left Corner 3,Left Side(L),42,22,3,0.5238095238095238,1.5714285714285714,2.2448979591836737,False,False,False
+Stephen Curry,Mid-Range,Center(C),41,21,2,0.5121951219512195,1.024390243902439,0.9994051160023796,False,False,False
+Stephen Curry,Mid-Range,Left Side Center(LC),30,11,2,0.36666666666666664,0.7333333333333333,0.9288888888888889,False,False,True
+Stephen Curry,Mid-Range,Left Side(L),41,14,2,0.34146341463414637,0.6829268292682927,0.8994646044021416,False,True,True
+Stephen Curry,Mid-Range,Right Side Center(RC),34,10,2,0.29411764705882354,0.5882352941176471,0.8304498269896194,False,True,True
+Stephen Curry,Mid-Range,Right Side(R),37,20,2,0.5405405405405406,1.0810810810810811,0.9934258582907232,False,False,True
+Stephen Curry,Restricted Area,Center(C),169,108,2,0.6390532544378699,1.2781065088757397,0.922656769720948,False,True,
+Stephen Curry,Right Corner 3,Right Side(R),36,20,3,0.5555555555555556,1.6666666666666667,2.222222222222222,False,True,True
+Nikola Jokic,Above the Break 3,Center(C),110,39,3,0.35454545454545455,1.0636363636363637,2.059586776859504,False,False,False
+Nikola Jokic,Above the Break 3,Left Side Center(LC),43,18,3,0.4186046511627907,1.255813953488372,2.190373174689021,False,False,False
+Nikola Jokic,Above the Break 3,Right Side Center(RC),62,24,3,0.3870967741935484,1.1612903225806452,2.1352757544224765,False,False,False
+Nikola Jokic,Backcourt,Back Court(BC),8,0,3,0.0,0.0,0.0,True,,
+Nikola Jokic,In The Paint (Non-RA),Center(C),496,304,2,0.6129032258064516,1.2258064516129032,0.9490114464099897,False,False,False
+Nikola Jokic,In The Paint (Non-RA),Left Side(L),15,11,2,0.7333333333333333,1.4666666666666666,0.7822222222222224,True,True,True
+Nikola Jokic,In The Paint (Non-RA),Right Side(R),24,15,2,0.625,1.25,0.9375,False,False,False
+Nikola Jokic,Left Corner 3,Left Side(L),5,2,3,0.4,1.2,2.16,True,False,False
+Nikola Jokic,Mid-Range,Center(C),78,31,2,0.3974358974358974,0.7948717948717948,0.957922419460881,False,False,False
+Nikola Jokic,Mid-Range,Left Side Center(LC),6,2,2,0.3333333333333333,0.6666666666666666,0.8888888888888888,True,False,False
+Nikola Jokic,Mid-Range,Left Side(L),29,15,2,0.5172413793103449,1.0344827586206897,0.9988109393579072,False,False,False
+Nikola Jokic,Mid-Range,Right Side Center(RC),16,7,2,0.4375,0.875,0.984375,True,False,False
+Nikola Jokic,Mid-Range,Right Side(R),39,19,2,0.48717948717948717,0.9743589743589743,0.9993425378040762,False,False,False
+Nikola Jokic,Restricted Area,Center(C),477,335,2,0.7023060796645703,1.4046121593291405,0.8362890005230101,False,False,
+Nikola Jokic,Right Corner 3,Right Side(R),3,0,3,0.0,0.0,0.0,True,True,True
+Giannis Antetokounmpo,Above the Break 3,Center(C),57,14,3,0.24561403508771928,0.7368421052631579,1.6675900277008313,False,False,False
+Giannis Antetokounmpo,Above the Break 3,Left Side Center(LC),41,13,3,0.3170731707317073,0.9512195121951219,1.94883997620464,False,False,True
+Giannis Antetokounmpo,Above the Break 3,Right Side Center(RC),22,7,3,0.3181818181818182,0.9545454545454546,1.9524793388429753,False,False,True
+Giannis Antetokounmpo,Backcourt,Back Court(BC),1,0,3,0.0,0.0,0.0,True,,
+Giannis Antetokounmpo,In The Paint (Non-RA),Center(C),207,80,2,0.3864734299516908,0.7729468599033816,0.9484468715722654,False,False,True
+Giannis Antetokounmpo,In The Paint (Non-RA),Left Side(L),7,1,2,0.14285714285714285,0.2857142857142857,0.4897959183673469,True,True,True
+Giannis Antetokounmpo,In The Paint (Non-RA),Right Side(R),4,0,2,0.0,0.0,0.0,True,True,True
+Giannis Antetokounmpo,Left Corner 3,Left Side(L),3,0,3,0.0,0.0,0.0,True,True,True
+Giannis Antetokounmpo,Mid-Range,Center(C),41,15,2,0.36585365853658536,0.7317073170731707,0.9280190362879238,False,False,True
+Giannis Antetokounmpo,Mid-Range,Left Side Center(LC),45,15,2,0.3333333333333333,0.6666666666666666,0.8888888888888888,False,False,True
+Giannis Antetokounmpo,Mid-Range,Left Side(L),62,24,2,0.3870967741935484,0.7741935483870968,0.9490114464099896,False,False,True
+Giannis Antetokounmpo,Mid-Range,Right Side Center(RC),12,3,2,0.25,0.5,0.75,True,False,True
+Giannis Antetokounmpo,Mid-Range,Right Side(R),14,4,2,0.2857142857142857,0.5714285714285714,0.8163265306122449,True,False,True
+Giannis Antetokounmpo,Restricted Area,Center(C),853,661,2,0.7749120750293084,1.5498241500586167,0.6976934040123197,False,True,

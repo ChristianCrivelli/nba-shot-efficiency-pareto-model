@@ -1,0 +1,14 @@
+# Raw Kaggle dataset -- large (Games.csv, PlayerStatistics*.csv,
+# TeamStatistics*.csv, PlayByPlay.parquet ~930MB) and re-downloadable via
+# data/data.py / kagglehub. Never commit this folder -- PlayByPlay.parquet
+# alone exceeds GitHub's 100MB hard file-size limit.
+data/515/
+
+# Player headshot cache -- regenerated on demand by player_headshots.py
+# from the NBA's CDN; not source data, just a local cache.
+data/headshots/
+data/headshots_smoke_test/
+
+# Python
+__pycache__/
+*.pyc
