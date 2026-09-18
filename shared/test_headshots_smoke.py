@@ -11,6 +11,12 @@ Checks:
   - an older, retired-a-while player (borderline case for CDN coverage)
   - a deliberately bogus ID (should fail gracefully -> None, not a crash)
 
+Repo layout (as of the 2026-09-17 reorganization): this script lives in
+shared/ alongside player_headshots.py -- run it from either the repo
+root (`python shared/test_headshots_smoke.py`) or from inside shared/
+itself (`python test_headshots_smoke.py`); its cache directory is
+resolved relative to the repo root either way.
+
 Usage:
     pip install requests pillow
     python test_headshots_smoke.py
@@ -19,6 +25,8 @@ Usage:
 from pathlib import Path
 
 from player_headshots import get_player_thumbnail, looks_like_placeholder, fetch_headshot
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 # A small, mixed sample: recent star, a player from further back, and a
 # deliberately invalid ID. Swap in players relevant to your actual 5
@@ -29,7 +37,7 @@ TEST_PLAYER_IDS = {
     "Deliberately bogus ID": 999999999,
 }
 
-CACHE_DIR = Path("data/headshots_smoke_test")
+CACHE_DIR = REPO_ROOT / "data" / "headshots_smoke_test"
 
 
 def main():

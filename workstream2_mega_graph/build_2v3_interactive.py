@@ -13,15 +13,21 @@ point without needing to hover -- per the project's dataviz skill,
 tooltips enhance, they never gate.
 
 Run this LOCALLY -- it needs data/season_totals_all.csv (from
-load_kaggle_season_totals.py) AND live internet access to fetch headshots
-from cdn.nba.com via player_headshots.py (same network restriction as
-everything else that talks to the NBA's servers -- unreachable from the
-Claude sandbox that wrote this script). Headshots are cached under
---headshots-cache-dir between runs, same as build_2v3_plots.py.
+load_kaggle_season_totals.py, in this same folder) AND live internet
+access to fetch headshots from cdn.nba.com via shared/player_headshots.py
+(same network restriction as everything else that talks to the NBA's
+servers -- unreachable from the Claude sandbox that wrote this script).
+Headshots are cached under --headshots-cache-dir between runs, same as
+build_2v3_plots.py.
 
 Output is fully self-contained (headshots embedded as base64 data URIs,
 no external JS/CSS/font dependencies) -- the HTML files work by opening
-them directly in a browser, no server needed.
+them directly in a browser, no server needed. They're written to
+outputs/ at the repo root -- see OUT_DIR below.
+
+Repo layout (as of the 2026-09-17 reorganization): this script lives in
+workstream2_mega_graph/; the shared headshot pipeline it imports lives in
+shared/, one level up -- see the sys.path tweak below.
 
 Usage:
     python build_2v3_interactive.py
@@ -32,6 +38,7 @@ import argparse
 import base64
 import json
 import logging
+import sys
 from io import BytesIO
 from pathlib import Path
 
@@ -41,8 +48,11 @@ import pandas as pd
 logging.basicConfig(level=logging.INFO, format="%(asctime)s  %(levelname)-7s  %(message)s", datefmt="%H:%M:%S")
 log = logging.getLogger(__name__)
 
-COMBINED_PATH = Path("data/season_totals_all.csv")
-OUT_DIR = Path(".")
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT / "shared"))  # for player_headshots.py
+
+COMBINED_PATH = REPO_ROOT / "data" / "season_totals_all.csv"
+OUT_DIR = REPO_ROOT / "outputs"
 
 # -- palette (same validated palette as build_2v3_plots.py) ----------------
 SURFACE = "#fcfcfb"
@@ -80,7 +90,7 @@ def _fetch_photo_data_uris(player_ids: set[int], cache_dir: Path) -> dict[int, s
     """Fetches + circular-crops a small headshot for each id, returns a
     dict of player_id -> base64 PNG data URI, or None if no usable real
     photo exists (fetch failed, or it's the generic silhouette
-    placeholder -- see player_headshots.py's 2026-09-08 validation)."""
+    placeholder -- see shared/player_headshots.py's 2026-09-08 validation)."""
     from player_headshots import fetch_headshot, looks_like_placeholder, circular_thumbnail
 
     out: dict[int, str | None] = {}
@@ -328,23 +338,51 @@ _RENDER_SCRIPT = r"""
   }, svg);
   dl.textContent = "EV(3) = EV(2)";
 
+  // -- marker positions -----------------------------------------------------
+  const pointPx = DATA.map((d) => [sx(d.ev2), sy(d.ev3)]);
+
+  // -- crowding-aware marker sizing ------------------------------------------
+  // Dense clusters of headshot markers overlap and become hard to read.
+  // Shrink each marker toward its nearest neighbor's on-screen distance
+  // (never below 55% of the configured size), so isolated points stay
+  // full-size and only genuinely crowded ones shrink. Labeled/highlighted
+  // points (top-10 scorers, the all-time scoring leader, the most recent
+  // season) are exempt -- they need to stay legible and their text label
+  // needs a stable anchor radius.
+  const MIN_SCALE = 0.55;
+  const restR = DATA.map((d, i) => {
+    const baseR = d.photo ? CONFIG.photoR : CONFIG.dotR;
+    if (d.labeled) return baseR;
+    let nearest = Infinity;
+    for (let j = 0; j < pointPx.length; j++) {
+      if (j === i) continue;
+      const dx = pointPx[i][0] - pointPx[j][0], dy = pointPx[i][1] - pointPx[j][1];
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < nearest) nearest = dist;
+    }
+    const t = Math.max(0, Math.min(1, nearest / (2 * baseR)));
+    return baseR * (MIN_SCALE + (1 - MIN_SCALE) * t);
+  });
+
   // -- markers ------------------------------------------------------------
   const defs = el("defs", {}, svg);
   svg.insertBefore(defs, svg.firstChild);
 
   const markerLayer = el("g", {}, svg);
-  const pointPx = [];
-  DATA.forEach((d, i) => {
-    const cx = sx(d.ev2), cy = sy(d.ev3);
-    pointPx.push([cx, cy]);
+  // Draw largest (least-crowded) markers first, smallest (most-crowded,
+  // and therefore hardest to see) last -- so the ones that most need to
+  // be visible end up on top rather than buried under a bigger neighbor.
+  const drawOrder = DATA.map((_, i) => i).sort((a, b) => restR[b] - restR[a]);
+  drawOrder.forEach((i) => {
     el("g", { id: "m-" + i, "data-i": i }, markerLayer);
   });
 
-  markerLayer.querySelectorAll("g").forEach((g, i) => {
+  drawOrder.forEach((i) => {
     const d = DATA[i];
+    const g = document.getElementById("m-" + i);
     const cx = pointPx[i][0], cy = pointPx[i][1];
+    const r = restR[i];
     if (d.photo) {
-      const r = CONFIG.photoR;
       const clipId = "clip-" + i;
       const clip = el("clipPath", { id: clipId }, defs);
       el("circle", { cx, cy, r: r - 1.2 }, clip);
@@ -354,10 +392,9 @@ _RENDER_SCRIPT = r"""
       }, g);
       el("circle", { class: "marker-ring", cx, cy, r, stroke: d.ring }, g);
     } else {
-      el("circle", { class: "marker-dot", cx, cy, r: CONFIG.dotR, fill: d.ring, opacity: 0.85 }, g);
+      el("circle", { class: "marker-dot", cx, cy, r, fill: d.ring, opacity: 0.85 }, g);
     }
     if (d.labeled) {
-      const r = d.photo ? CONFIG.photoR : CONFIG.dotR;
       const t = el("text", { class: "marker-label", x: cx + r + 5, y: cy + 4 }, svg);
       t.textContent = d.labelText;
     }
@@ -394,7 +431,7 @@ _RENDER_SCRIPT = r"""
     if (hovered >= 0) {
       const prev = document.getElementById("m-" + hovered);
       if (prev) prev.querySelectorAll(".marker-ring, .marker-dot").forEach((n) => {
-        n.setAttribute("r", n.classList.contains("marker-ring") ? CONFIG.photoR : CONFIG.dotR);
+        n.setAttribute("r", restR[hovered]);
       });
     }
     hovered = -1;
@@ -420,8 +457,12 @@ _RENDER_SCRIPT = r"""
       clearHover();
       hovered = best;
       const g = document.getElementById("m-" + best);
-      g.querySelectorAll(".marker-ring").forEach((n) => n.setAttribute("r", CONFIG.photoR * 1.3));
-      g.querySelectorAll(".marker-dot").forEach((n) => n.setAttribute("r", CONFIG.dotR * 1.4));
+      // Hover enlarges from the marker's own resting size (which may have
+      // been shrunk for crowding), not a flat configured size, and brings
+      // it to the front of its layer so it isn't occluded by a neighbor.
+      markerLayer.appendChild(g);
+      g.querySelectorAll(".marker-ring").forEach((n) => n.setAttribute("r", Math.max(restR[best] * 1.3, CONFIG.photoR * 0.9)));
+      g.querySelectorAll(".marker-dot").forEach((n) => n.setAttribute("r", Math.max(restR[best] * 1.4, CONFIG.dotR * 0.9)));
     }
     const d = DATA[best];
     tooltip.innerHTML = "";
@@ -516,7 +557,7 @@ def main():
     parser.add_argument("--min-fga", type=int, default=200)
     parser.add_argument("--sample-seed", type=int, default=42)
     parser.add_argument("--historic-start", default="1996-97")
-    parser.add_argument("--headshots-cache-dir", type=Path, default=Path("data/headshots"))
+    parser.add_argument("--headshots-cache-dir", type=Path, default=REPO_ROOT / "data" / "headshots")
     args = parser.parse_args()
 
     if not COMBINED_PATH.exists():
@@ -525,8 +566,9 @@ def main():
     try:
         import player_headshots  # noqa: F401
     except ImportError as e:
-        raise SystemExit(f"needs player_headshots.py's dependencies (pip install pillow requests): {e}")
+        raise SystemExit(f"needs shared/player_headshots.py's dependencies (pip install pillow requests): {e}")
 
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
     df = pd.read_csv(COMBINED_PATH)
 
     current_pool = _current_era_population(df, args.season, args.min_fga, args.sample_seed)

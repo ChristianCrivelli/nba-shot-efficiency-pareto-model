@@ -61,6 +61,14 @@ for the full discussion of each):
     selectable option in a normal offensive possession. They're still
     computed and kept in the raw per-zone stats table for completeness.
 
+    NOTE (flagged 2026-09-16, not yet acted on): this same low-sample/
+    near-zero-variance artifact can recur outside the heave zones too --
+    e.g. a player's 0-for-3 zone has RISK_VAR=0 by construction, which can
+    make it read as "Pareto-efficient" purely for lack of data to
+    dominate it, not because it's a good shot. LOW_SAMPLE already flags
+    these cells; see the comprehensive project report for specific
+    examples if this needs a closer look.
+
   - Two frontiers are computed per entity, per the "show both" decision:
       EFF_FULL   -- Pareto-efficient among all zones except Backcourt.
                     Restricted Area / dunks-and-layups predictably
@@ -82,7 +90,15 @@ with a real season's worth of attempts (1,269-1,652 shots each).
 
 Output: data/zone_efficiency.csv, one row per (entity, zone) -- the full
 underlying numbers table, not gated behind the heatmap visualization
-(see build_zone_heatmaps.py).
+(see build_zone_heatmaps.py, in this same folder).
+
+Repo layout (as of the 2026-09-17 reorganization): this script lives in
+workstream1_zones/ alongside court_viz.py and build_zone_heatmaps.py.
+Paths below are resolved relative to the repo root (via REPO_ROOT), not
+the current working directory, so this can be run either as
+`python workstream1_zones/zone_efficiency.py` from the repo root or as
+`python zone_efficiency.py` from inside workstream1_zones/ -- either way
+it reads/writes the same repo-root-level data/ folder.
 
 Usage:
     python zone_efficiency.py
@@ -93,8 +109,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-SHOT_LOG_PATH = Path("data/shot_log_2023_24.csv")
-OUT_PATH = Path("data/zone_efficiency.csv")
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+SHOT_LOG_PATH = REPO_ROOT / "data" / "shot_log_2023_24.csv"
+OUT_PATH = REPO_ROOT / "data" / "zone_efficiency.csv"
 
 LOW_SAMPLE_THRESHOLD = 20  # fewer attempts than this -> flagged, not dropped
 

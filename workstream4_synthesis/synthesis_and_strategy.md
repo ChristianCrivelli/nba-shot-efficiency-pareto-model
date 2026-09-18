@@ -4,7 +4,7 @@ This is the project's final write-up (workstream 4), pulling together the
 break-even math from workstream 3, the population-level "Mega Graph" from
 workstream 2, and the zone-level frontiers from workstream 1 into one
 coaching-facing conclusion. Working notes and methodology detail for all
-four workstreams live in `report.md` and the project's decisions log;
+four workstreams live in `docs/report.md` and the project's decisions log;
 this document states the findings, not how they were built.
 
 ## The core relationship
@@ -22,10 +22,10 @@ running through all three findings below.
 ## Finding 1 — The league didn't clear its own break-even line until 2021-22
 
 Applying the formula above to actual league-wide shooting each season
-(`data/breakeven_trend.csv`, `breakeven_trend.png`) turns up a specific,
-countable answer to the spec's question of "how the frontier has moved
-outward across eras" — and it's not the answer the modern "Moreyball"
-narrative would suggest.
+(`data/breakeven_trend.csv`, `outputs/breakeven_trend.png`) turns up a
+specific, countable answer to the spec's question of "how the frontier
+has moved outward across eras" — and it's not the answer the modern
+"Moreyball" narrative would suggest.
 
 League-wide 3-point percentage has been remarkably flat for three
 decades: 34-37% every single season from 1996-97 through 2025-26, no
@@ -59,15 +59,15 @@ more rim shots) that eventually caught the break-even line up to where
 
 ## Finding 2 — "Pareto-efficient" is not the same as "a good shot"
 
-Workstream 1's zone-level frontiers (`zone_efficiency_full.png`,
-`zone_efficiency_nonra.png`, `data/zone_efficiency.csv`) are the natural
-zone-level counterpart to Finding 1, and they surface a distinction worth
-stating plainly before drawing any coaching conclusion from them: a zone
-is "Pareto-efficient" here because *no other zone beats it on both
-expected points and risk at once* — not because it's a high-value shot in
-absolute terms. A low-risk, low-return zone can sit on the frontier
-perfectly legitimately, as the anchor at the safe end, without being a
-shot anyone should actually want more of.
+Workstream 1's zone-level frontiers (`outputs/zone_efficiency_full.png`,
+`outputs/zone_efficiency_nonra.png`, `data/zone_efficiency.csv`) are the
+natural zone-level counterpart to Finding 1, and they surface a
+distinction worth stating plainly before drawing any coaching conclusion
+from them: a zone is "Pareto-efficient" here because *no other zone
+beats it on both expected points and risk at once* — not because it's a
+high-value shot in absolute terms. A low-risk, low-return zone can sit on
+the frontier perfectly legitimately, as the anchor at the safe end,
+without being a shot anyone should actually want more of.
 
 That distinction matters because it's exactly what shows up in the
 non-RA ("jump shots only") cut: **mid-range zones are Pareto-efficient
@@ -163,21 +163,21 @@ these":
   average would substantially narrow.
 - **The portfolio framing is a simplification.** Treating each shot as an
   independent, one-shot risk/return draw is the framing the whole project
-  is built on (see `project_description.md`), and it's a reasonable one
-  for this kind of analysis — but it doesn't capture second-order effects
-  like offensive rebounding rates by shot type, free-throw generation, or
-  how a team's shot profile affects its opponent's transition
-  opportunities.
+  is built on (see `docs/project_description.md`), and it's a reasonable
+  one for this kind of analysis — but it doesn't capture second-order
+  effects like offensive rebounding rates by shot type, free-throw
+  generation, or how a team's shot profile affects its opponent's
+  transition opportunities.
 
 ## Where this leaves the four workstreams
 
 | # | Workstream | Status |
 |---|---|---|
-| 1 | Efficient Zones + Players | Done — `zone_efficiency_full.png`, `zone_efficiency_nonra.png` |
-| 2 | Mega Graph + Efficiency Gap | Done — `two_vs_three_2025_26*.png/html`, `two_vs_three_historic_top100*.png/html` |
+| 1 | Efficient Zones + Players | Done — `outputs/zone_efficiency_full.png`, `outputs/zone_efficiency_nonra.png` |
+| 2 | Mega Graph + Efficiency Gap | Done — `outputs/two_vs_three_2025_26*.png/html`, `outputs/two_vs_three_historic_top100*.png/html` |
 | 3 | 2 vs 3 (core scatter + break-even relation) | Done — folded into workstreams 1, 2, and 4 |
 | 4 | Synthesis & Strategy | Done — this document |
 
-All four are now built. `report.md` remains the working methodology
+All four are now built. `docs/report.md` remains the working methodology
 notes; the project decisions log has the full session-by-session history
 of what was tried, what changed, and why.

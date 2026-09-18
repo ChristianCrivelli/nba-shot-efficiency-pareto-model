@@ -5,7 +5,7 @@ Workstream 1 ("Efficient Zones + Players"): renders the zone-level
 Pareto-efficiency heatmaps -- gold for efficient zones, red for
 sub-optimal, per the original Notion spec -- for the league average and
 5 named players, reading data/zone_efficiency.csv (produced by
-zone_efficiency.py).
+zone_efficiency.py, in this same folder).
 
 Two figures, matching the "show both" decision on Restricted-Area
 dominance (see zone_efficiency.py / the project decisions log):
@@ -24,9 +24,9 @@ Each panel is a half-court diagram, one per entity (League Average + the
 5 players), laid out as a 2x3 grid. Zone shapes are analytic
 approximations built in court_viz.py, not exact shot-by-shot boundaries
 -- see that module's docstring. Backcourt (and the "Above the Break 3"/
-Back Court(BC) heave anomaly) is always shown as a single grayed,
-hatched band regardless of view: it's excluded from both frontiers
-entirely, not merely "dominated."
+Back Court(BC) heave anomaly) is always shown as a single grayed, hatched
+band regardless of view: it's excluded from both frontiers entirely, not
+merely "dominated."
 
 Every zone's fill carries a text label (FG%, points per shot) so the read
 never depends on color alone, and a zone with fewer than
@@ -36,6 +36,9 @@ small samples get flagged, not hidden or dropped. A zone with literally
 zero shots for that entity gets a distinct dotted-gray "no shots" tile,
 separate from the "excluded from this frontier" treatment used for
 Restricted Area (in the non-RA view) and the heave band.
+
+Outputs land in outputs/ at the repo root (as of the 2026-09-17
+reorganization), not next to this script -- see OUT_DIR below.
 
 Usage:
     python zone_efficiency.py        # writes data/zone_efficiency.csv first
@@ -51,16 +54,18 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 from PIL import Image
 
-from court_viz import (BACKCOURT_LABEL_XY, HALFCOURT_Y, ZONE_SHAPES,
+from workstream1_zones.court_viz import (BACKCOURT_LABEL_XY, HALFCOURT_Y, ZONE_SHAPES,
                         draw_backcourt_band, draw_court_lines,
                         setup_half_court_axes, zone_patch)
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 PANEL_XLIM = (-29, 29)
 PANEL_YLIM = (-8, HALFCOURT_Y + 13)
 PANEL_DPI = 170
 
-ZONE_EFFICIENCY_PATH = Path("data/zone_efficiency.csv")
-OUT_DIR = Path(".")
+ZONE_EFFICIENCY_PATH = REPO_ROOT / "data" / "zone_efficiency.csv"
+OUT_DIR = REPO_ROOT / "outputs"
 
 # -- palette: reuses the project's existing chart chrome (build_2v3_plots.py),
 # plus a gold/red status pair for efficient/dominated, validated with the
@@ -210,6 +215,8 @@ def build_figure(df: pd.DataFrame, frontier_col: str, subtitle: str, out_path: P
 def main():
     if not ZONE_EFFICIENCY_PATH.exists():
         raise SystemExit(f"{ZONE_EFFICIENCY_PATH} not found -- run zone_efficiency.py first.")
+
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     df = pd.read_csv(ZONE_EFFICIENCY_PATH)
     missing = set(ENTITY_ORDER) - set(df["ENTITY"].unique())

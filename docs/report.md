@@ -7,6 +7,18 @@ session-by-session history — including things that were tried and
 abandoned, like the stats.nba.com pull below — see the project's
 decisions log.)
 
+**Repo layout (as of the 2026-09-17 reorganization):** the repo is
+organized by workstream —  `workstream1_zones/`, `workstream2_mega_graph/`,
+`workstream4_synthesis/` (workstream 3 has no scripts of its own; its math
+is folded into 1, 2, and 4) — plus `shared/` for code used by more than
+one workstream, `outputs/` for generated PNG/HTML/PDF chart artifacts,
+`legacy/` for superseded/exploratory scripts, `docs/` for this file and
+`project_description.md`, and `data/` (unchanged, still at the repo
+root) for every raw and derived CSV. Every path below reflects that
+layout; script and image filenames are qualified with their folder
+except where they're just illustrating a concept rather than pointing at
+a real repo path.
+
 ## Project scope
 
 The Efficient Frontier of Sports (Pareto 2v3) treats the basketball court
@@ -72,7 +84,7 @@ The original plan was to pull season box scores live from the NBA's own
 stats API (`stats.nba.com/stats/leaguedashplayerstats`). That turned out to
 be a dead end: the `stats.nba.com` subdomain specifically is unreachable
 from this project's network (a geo-blocking issue, confirmed by testing
-directly in a browser — the rest of nba.com loads fine). `season_totals.py`
+directly in a browser — the rest of nba.com loads fine). `legacy/season_totals.py`
 is the script that implements that abandoned approach; it's kept in the
 repo as a record of what was tried, but **it is not part of the current
 pipeline** — don't run it expecting current data.
@@ -117,7 +129,7 @@ non-obvious things worth knowing if this is ever touched again:
 
 - The CDN does **not** 404 for an invalid player ID — it returns a
   generic gray silhouette placeholder with an HTTP 200, same as a real
-  photo would. `looks_like_placeholder()` (in `player_headshots.py`)
+  photo would. `looks_like_placeholder()` (in `shared/player_headshots.py`)
   detects this by compositing the image onto white first (see next point)
   and checking for near-zero color saturation plus a very low unique-color
   count — both together, so a genuinely black-and-white archival photo
@@ -140,16 +152,18 @@ Two-stage, both stages run **locally** (not in a cloud sandbox — no
 network access to cdn.nba.com/kaggle, and the raw files are too large to
 move):
 
-1. `load_kaggle_season_totals.py` — reads the ~450MB
-   `data/515/PlayerStatisticsExtended.csv`, filters to
+1. `workstream2_mega_graph/load_kaggle_season_totals.py` — reads the
+   ~450MB `data/515/PlayerStatisticsExtended.csv`, filters to
    `gameType == "Regular Season"`, aggregates per-game rows to one row per
    player-season, and writes the small `data/season_totals_all.csv` (the
    only output that needs to travel anywhere).
-2. `build_2v3_plots.py` (static PNGs) and/or `build_2v3_interactive.py`
-   (interactive HTML, needs live internet to fetch headshots) — both read
-   `data/season_totals_all.csv` and produce the actual deliverables.
+2. `workstream2_mega_graph/build_2v3_plots.py` (static PNGs) and/or
+   `workstream2_mega_graph/build_2v3_interactive.py` (interactive HTML,
+   needs live internet to fetch headshots) — both read
+   `data/season_totals_all.csv` and produce the actual deliverables in
+   `outputs/`.
 
-`season_totals.py` (the abandoned stats.nba.com puller) and its
+`legacy/season_totals.py` (the abandoned stats.nba.com puller) and its
 `POSS_EST` formula are **not** part of this pipeline — see above.
 
 ## Workstream 1 ("Efficient Zones + Players") — what we built
@@ -172,8 +186,9 @@ as-is rather than re-sourcing new data. **This means workstream 1 runs on
 the 2023-24 season while workstream 2 runs on 2025-26** — a real, known
 mismatch between the two workstreams, not an oversight; flagged here so
 nobody assumes both are looking at the same year. If a matching shot log
-for a more recent season becomes available, `zone_efficiency.py`'s
-`SHOT_LOG_PATH` is the only thing that needs to change.
+for a more recent season becomes available,
+`workstream1_zones/zone_efficiency.py`'s `SHOT_LOG_PATH` is the only
+thing that needs to change.
 
 ### Risk: points-per-shot variance, computed per-shot (not per-zone)
 
@@ -203,11 +218,13 @@ Including the Restricted Area, layups/dunks trivially dominate every
 jump shot (highest EV, lowest risk) — mathematically correct, but not the
 live decision a coach faces once a shot at the rim isn't available. Rather
 than picking one framing, both are built:
-- **Full frontier** (`zone_efficiency_full.png`) — every zone. RA (and
-  usually one or two others) shows gold; almost everything else is red.
-- **Non-RA cut** (`zone_efficiency_nonra.png`) — Restricted Area excluded
-  (grayed on the diagram, not scored), isolating the real jump-shot
-  tradeoff among mid-range, corner-3, and above-the-break-3 zones.
+- **Full frontier** (`outputs/zone_efficiency_full.png`) — every zone. RA
+  (and usually one or two others) shows gold; almost everything else is
+  red.
+- **Non-RA cut** (`outputs/zone_efficiency_nonra.png`) — Restricted Area
+  excluded (grayed on the diagram, not scored), isolating the real
+  jump-shot tradeoff among mid-range, corner-3, and above-the-break-3
+  zones.
 
 Desperation heaves are excluded from **both** frontiers entirely (not
 merely shown as "dominated"): a ~2%-make-rate, near-halfcourt shot has
@@ -232,36 +249,37 @@ same as a stable one.
 
 ### Zone shapes on the heatmap are analytic approximations, not exact geometry
 
-The half-court diagram (`court_viz.py`) draws each zone as a wedge or
-rectangle sized from standard, real-data-cross-checked constants
-(restricted-area radius 4ft, lane depth 14ft, 3PT arc at 23.75ft with the
-22ft corner line) — not the shot-chart provider's exact pixel-level
-boundary logic. Every shot is still correctly assigned to its real zone
-upstream in the data; this only affects where a zone's boundary is *drawn*
-on the picture, not which numbers go with which zone.
+The half-court diagram (`workstream1_zones/court_viz.py`) draws each zone
+as a wedge or rectangle sized from standard, real-data-cross-checked
+constants (restricted-area radius 4ft, lane depth 14ft, 3PT arc at
+23.75ft with the 22ft corner line) — not the shot-chart provider's exact
+pixel-level boundary logic. Every shot is still correctly assigned to its
+real zone upstream in the data; this only affects where a zone's boundary
+is *drawn* on the picture, not which numbers go with which zone.
 
 Output: `data/zone_efficiency.csv` (the full per-entity, per-zone numbers
 table — FG%, EV, risk variance, sample size, both frontier flags — never
 gated behind the heatmap image) plus the two PNGs above. Pipeline:
-`zone_efficiency.py` (computes the table) then `build_zone_heatmaps.py`
-(renders the heatmaps); both run locally or in a sandbox, no network
-needed — `data/shot_log_2023_24.csv` was already in the repo.
+`workstream1_zones/zone_efficiency.py` (computes the table) then
+`workstream1_zones/build_zone_heatmaps.py` (renders the heatmaps into
+`outputs/`); both run locally or in a sandbox, no network needed —
+`data/shot_log_2023_24.csv` was already in the repo.
 
 ## Workstream 4 ("Synthesis & Strategy") — what we built
 
-The coaching-facing write-up, `synthesis_and_strategy.md`, pulling
-together workstreams 1-3 into three findings rather than introducing new
-methodology of its own:
+The coaching-facing write-up, `workstream4_synthesis/synthesis_and_strategy.md`,
+pulling together workstreams 1-3 into three findings rather than
+introducing new methodology of its own:
 
-- **Era trend** (`build_breakeven_trend.py` → `breakeven_trend.png`,
-  `data/breakeven_trend.csv`): league-wide FG2% vs. the break-even FG2%
-  implied by that season's league-wide FG3% (`1.5 x FG3_PCT`, the same
-  relation as workstream 3), summed from `data/season_totals_all.csv`
-  (the same file workstream 2 uses) across all 47 seasons back to
-  1996-97. The finding: league FG3% has been flat (34-37%) for three
-  decades — the break-even target barely moved — and league FG2% didn't
-  clear its own break-even line until **2021-22**, driven by better shot
-  quality at the rim rather than a moving target.
+- **Era trend** (`workstream4_synthesis/build_breakeven_trend.py` →
+  `outputs/breakeven_trend.png`, `data/breakeven_trend.csv`): league-wide
+  FG2% vs. the break-even FG2% implied by that season's league-wide FG3%
+  (`1.5 x FG3_PCT`, the same relation as workstream 3), summed from
+  `data/season_totals_all.csv` (the same file workstream 2 uses) across
+  all 47 seasons back to 1996-97. The finding: league FG3% has been flat
+  (34-37%) for three decades — the break-even target barely moved — and
+  league FG2% didn't clear its own break-even line until **2021-22**,
+  driven by better shot quality at the rim rather than a moving target.
 - **Zone-level nuance**: reusing workstream 1's `data/zone_efficiency.csv`
   to make the point that "Pareto-efficient" isn't the same as "a good
   shot" — mid-range zones are efficient 20 of 30 times on the non-RA cut
@@ -289,12 +307,48 @@ one team or player; it also uses a different season (1996-97 through
 only) — the season-mismatch caveat below applies here directly, not just
 as a note for later.
 
+### Coaching-facing PDF (2026-09-16)
+
+`workstream4_synthesis/build_synthesis_pdf.py` renders the same content
+as `workstream4_synthesis/synthesis_and_strategy.pdf` — a real document
+(cover page, the three findings with their charts embedded, the two wide
+zone-heatmap figures on their own landscape pages, caveats, and the
+workstream status table) for the project's actual stated audience (head
+coaches, analytics departments, player-development teams), rather than a
+markdown file in a git repo. Built with reportlab's Platypus layer
+(`BaseDocTemplate` with mixed portrait/landscape page templates, since
+the two zone-heatmap figures are wide 6-panel grids that need the extra
+width). **Not a markdown-to-PDF converter** — the section content is
+transcribed by hand in the script, so if
+`workstream4_synthesis/synthesis_and_strategy.md` changes, the script's
+section content needs a matching manual update; it is not read at build
+time.
+
 ## Still open / not yet addressed
 
 - **Season mismatch** — workstream 1 runs on 2023-24 shot-location data,
-  workstream 2 on 2025-26 season totals (see above). Not a blocker for
-  either workstream individually, but worth resolving (e.g. sourcing a
-  2025-26 shot log) before any write-up that directly compares numbers
-  across the two.
-- **Marker crowding** on workstream 2's interactive plots (dense headshot
-  overlap) — cosmetic, not yet requested as a fix (see the decisions log).
+  workstream 2 on 2025-26 season totals (see above). Searched 2026-09-16
+  for a 2025-26 per-shot dataset to close this; none found (see the
+  decisions log for exactly what was checked) — decision was to document
+  the mismatch rather than keep chasing a source, and worth only a quick
+  re-check in a future session rather than repeating the same search.
+- **Marker crowding** on workstream 2's interactive plots — **fixed
+  2026-09-16**: `build_2v3_interactive.py`'s render script now shrinks
+  each marker toward its nearest neighbor's on-screen distance (down to
+  55% of its configured size; labeled/highlighted markers are exempt),
+  and draws the most-crowded markers last so they sit on top. Verified
+  headless against the real HTML files — zero console errors, hover
+  still shows correct data, most markers on both plots measurably
+  smaller in dense clusters.
+- **Low-sample Pareto-efficiency artifact beyond the heave zones**
+  (flagged 2026-09-16, not yet acted on) — see the note in
+  `workstream1_zones/zone_efficiency.py`'s docstring: a player's 0-for-3
+  zone has `RISK_VAR=0` by construction, which can make it read as
+  "Pareto-efficient" purely for lack of data to dominate it, not because
+  it's a good shot. `LOW_SAMPLE` already flags these cells; worth a
+  closer look in a future session if this needs tightening up.
+- **Repo reorganization** (2026-09-17) — the flat repo (15 Python files,
+  docs, a PDF, and generated PNGs/HTML all sitting at the root) was
+  reorganized by workstream, per the layout note at the top of this file.
+  No methodology or output changed — only file locations, import paths,
+  and internal path constants.

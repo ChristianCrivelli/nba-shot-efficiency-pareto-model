@@ -44,6 +44,13 @@ still eyeball a sample of the historic-plot output before trusting it
 wholesale, especially for players from well before modern digital
 photography.
 
+Repo layout (as of the 2026-09-17 reorganization): this module lives in
+shared/, since it's imported by scripts in both workstream1_zones/ and
+workstream2_mega_graph/. Its cache directory is resolved relative to the
+repo root (via REPO_ROOT), not the current working directory, so it
+always lands at data/headshots regardless of where the importing script
+runs from.
+
 Usage:
     from player_headshots import get_player_thumbnail, add_headshot_marker
 
@@ -65,8 +72,10 @@ from PIL import Image, ImageChops, ImageDraw
 
 log = logging.getLogger(__name__)
 
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
 HEADSHOT_URL_TEMPLATE = "https://cdn.nba.com/headshots/nba/latest/1040x760/{player_id}.png"
-DEFAULT_CACHE_DIR = Path("data/headshots")
+DEFAULT_CACHE_DIR = REPO_ROOT / "data" / "headshots"
 REQUEST_TIMEOUT = 10
 MISSING_SENTINEL_SUFFIX = ".missing"  # remembers a 404 so we don't re-request it every run
 

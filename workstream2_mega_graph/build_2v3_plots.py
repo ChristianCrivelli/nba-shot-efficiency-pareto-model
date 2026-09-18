@@ -3,7 +3,8 @@ build_2v3_plots.py
 
 The "Mega Graph" workstream: two scatter plots of expected points per 100
 possessions from 2s (x) vs. from 3s (y), both built on top of
-data/season_totals_all.csv (produced by season_totals.py).
+data/season_totals_all.csv (produced by load_kaggle_season_totals.py, in
+this same folder).
 
   Plot 1 -- "current era": 90 randomly-sampled 2025-26 players (minimum
   attempts floor applied so we're not sampling end-of-bench noise) plus
@@ -19,15 +20,20 @@ Both share an "iso-efficiency" diagonal (EV100_FROM_2 == EV100_FROM_3):
 anyone above the line is, on this metric, statistically better off hunting
 more 3s; anyone below is better off leaning on 2s.
 
-Optional --headshots flag (see player_headshots.py / GitHub issue "Add
-player headshots to 2v3 scatter plots"): stamps each HIGHLIGHTED point's
-face on top of its dot -- the 10 highest scorers in Plot 1, the two
-labeled points in Plot 2 -- not the full random-90/other-99 population,
-to avoid overplotting. The colored dot is always drawn underneath as a
-fallback layer, so a player with no available headshot (old players,
-fetch failure) just shows the plain dot instead, same as without the flag.
-NOT YET VALIDATED against real headshots -- run test_headshots_smoke.py
-first (see player_headshots.py's module docstring).
+Optional --headshots flag (see shared/player_headshots.py / GitHub issue
+"Add player headshots to 2v3 scatter plots"): stamps each HIGHLIGHTED
+point's face on top of its dot -- the 10 highest scorers in Plot 1, the
+two labeled points in Plot 2 -- not the full random-90/other-99
+population, to avoid overplotting. The colored dot is always drawn
+underneath as a fallback layer, so a player with no available headshot
+(old players, fetch failure) just shows the plain dot instead, same as
+without the flag.
+
+Repo layout (as of the 2026-09-17 reorganization): this script lives in
+workstream2_mega_graph/; the shared headshot pipeline it optionally
+imports lives in shared/, one level up from here -- see the sys.path
+tweak below. Paths are resolved relative to the repo root (via
+REPO_ROOT), not the current working directory.
 
 Usage:
     python build_2v3_plots.py
@@ -36,6 +42,7 @@ Usage:
 """
 
 import argparse
+import sys
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -44,8 +51,11 @@ import pandas as pd
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.lines import Line2D
 
-COMBINED_PATH = Path("data/season_totals_all.csv")
-OUT_DIR = Path(".")
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT / "shared"))  # for player_headshots.py
+
+COMBINED_PATH = REPO_ROOT / "data" / "season_totals_all.csv"
+OUT_DIR = REPO_ROOT / "outputs"
 
 # -- palette (validated via the dataviz skill's contrast/CVD checker) ------
 SURFACE = "#fcfcfb"
@@ -214,21 +224,23 @@ def main():
     parser.add_argument("--historic-start", default="1996-97", help="first season eligible for the historic top-100")
     parser.add_argument("--headshots", action="store_true",
                          help="stamp player headshots on highlighted points (needs internet + Pillow; "
-                              "see player_headshots.py -- NOT yet validated against real player IDs)")
-    parser.add_argument("--headshots-cache-dir", type=Path, default=Path("data/headshots"))
+                              "see shared/player_headshots.py)")
+    parser.add_argument("--headshots-cache-dir", type=Path, default=REPO_ROOT / "data" / "headshots")
     args = parser.parse_args()
 
     if not COMBINED_PATH.exists():
-        raise SystemExit(f"{COMBINED_PATH} not found -- run season_totals.py first.")
+        raise SystemExit(f"{COMBINED_PATH} not found -- run load_kaggle_season_totals.py first.")
 
     if args.headshots:
         try:
             import player_headshots  # noqa: F401 -- import check only
         except ImportError as e:
-            raise SystemExit(f"--headshots needs player_headshots.py's dependencies (pip install pillow requests): {e}")
+            raise SystemExit(f"--headshots needs shared/player_headshots.py's dependencies "
+                              f"(pip install pillow requests): {e}")
 
     headshots_cache_dir = args.headshots_cache_dir if args.headshots else None
 
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
     df = pd.read_csv(COMBINED_PATH)
 
     p1 = plot_current_era(df, args.season, args.min_fga, args.sample_seed, headshots_cache_dir=headshots_cache_dir)

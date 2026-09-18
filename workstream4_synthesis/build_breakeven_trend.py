@@ -37,6 +37,13 @@ Caveat carried into the write-up, not hidden here: this is a LEAGUE
 AVERAGE. It says nothing about any single shot, shooter, or matchup --
 see synthesis_and_strategy.md for the full caveat list.
 
+Repo layout (as of the 2026-09-17 reorganization): this script lives in
+workstream4_synthesis/. Paths below are resolved relative to the repo
+root (via REPO_ROOT), not the current working directory -- it reads
+data/season_totals_all.csv, writes data/breakeven_trend.csv (a derived
+CSV, alongside the other data/ files), and writes its chart to
+outputs/breakeven_trend.png.
+
 Usage:
     python build_breakeven_trend.py
 """
@@ -46,8 +53,11 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 
-COMBINED_PATH = Path("data/season_totals_all.csv")
-OUT_PATH = Path("breakeven_trend.png")
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+COMBINED_PATH = REPO_ROOT / "data" / "season_totals_all.csv"
+BREAKEVEN_CSV_PATH = REPO_ROOT / "data" / "breakeven_trend.csv"
+OUT_PATH = REPO_ROOT / "outputs" / "breakeven_trend.png"
 
 # -- palette: same chart chrome as build_2v3_plots.py / build_zone_heatmaps.py --
 SURFACE = "#fcfcfb"
@@ -138,6 +148,7 @@ def build_figure(g: pd.DataFrame) -> Path:
     fig.suptitle("Workstream 4 — The 2-vs-3 break-even line across eras, 1996-97 to 2025-26",
                  color=INK_PRIMARY, fontsize=14, fontweight="bold", y=0.995)
     fig.tight_layout(rect=[0, 0, 1, 0.965])
+    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT_PATH, facecolor=SURFACE)
     plt.close(fig)
     return OUT_PATH
@@ -150,8 +161,9 @@ def main():
     df = pd.read_csv(COMBINED_PATH)
     g = compute_league_trend(df)
 
-    g.to_csv("data/breakeven_trend.csv", index=False)
-    print(f"Saved: data/breakeven_trend.csv ({len(g)} seasons)")
+    BREAKEVEN_CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
+    g.to_csv(BREAKEVEN_CSV_PATH, index=False)
+    print(f"Saved: {BREAKEVEN_CSV_PATH} ({len(g)} seasons)")
 
     out = build_figure(g)
     print(f"Saved: {out}")

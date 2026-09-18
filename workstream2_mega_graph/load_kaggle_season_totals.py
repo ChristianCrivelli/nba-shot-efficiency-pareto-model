@@ -4,10 +4,10 @@ load_kaggle_season_totals.py
 Aggregates the Kaggle "historical-nba-data-and-player-box-scores" dataset
 (data/515/PlayerStatisticsExtended.csv) from per-game rows up to
 per-player, per-season totals, in the schema build_2v3_plots.py already
-expects (data/season_totals_all.csv). Replaces season_totals.py, which
-pulled the same shape of data live from stats.nba.com -- before we found
-stats.nba.com is unreachable from this network (see the project decisions
-log for the full story).
+expects (data/season_totals_all.csv). Replaces legacy/season_totals.py,
+which pulled the same shape of data live from stats.nba.com -- before we
+found stats.nba.com is unreachable from this network (see the project
+decisions log for the full story).
 
 Run this LOCALLY -- PlayerStatisticsExtended.csv is 450MB+, not something
 to push through the Claude session. This script's OUTPUT
@@ -33,6 +33,14 @@ plot's start season from the originally-planned 1979-80 up to 1996-97 (see
 decisions log) so every dot on every plot uses the same real POSS_ACTUAL
 figure rather than mixing it with an estimated one.
 
+Repo layout (as of the 2026-09-17 reorganization): this script lives in
+workstream2_mega_graph/ alongside build_2v3_plots.py and
+build_2v3_interactive.py. Paths below are resolved relative to the repo
+root (via REPO_ROOT), not the current working directory, so this can be
+run either as `python workstream2_mega_graph/load_kaggle_season_totals.py`
+from the repo root or as `python load_kaggle_season_totals.py` from inside
+workstream2_mega_graph/.
+
 Usage:
     python load_kaggle_season_totals.py
 """
@@ -46,8 +54,10 @@ import pandas as pd
 logging.basicConfig(level=logging.INFO, format="%(asctime)s  %(levelname)-7s  %(message)s", datefmt="%H:%M:%S")
 log = logging.getLogger(__name__)
 
-RAW_PATH = Path("data/515/PlayerStatisticsExtended.csv")
-OUT_PATH = Path("data/season_totals_all.csv")
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+RAW_PATH = REPO_ROOT / "data" / "515" / "PlayerStatisticsExtended.csv"
+OUT_PATH = REPO_ROOT / "data" / "season_totals_all.csv"
 
 # Only pull the ~15 columns we need out of this ~100-column file -- keeps
 # memory and load time down a lot on a 450MB+ CSV.
